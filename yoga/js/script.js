@@ -95,4 +95,53 @@ window.addEventListener('DOMContentLoaded', function() {
         document.body.style.overflow = '';
     });
 
+    //Form
+
+    let message = {
+        loading: 'Загрука...',
+        success: 'Спасибо! Скоро с Вами свяжемся.',
+        failure: 'Что-то пошло не так...'
+    };
+
+    let form = document.querySelector('.main-form'),
+        inpunt = document.getElementsByTagName('input'),
+        stausMessage = document.createElement('div');
+
+        stausMessage.classList.add('staus');
+
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        form.appendChild(stausMessage);
+
+        let request = new XMLHttpRequest();
+        request.open('POST', 'server.php');
+        //request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        request.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
+
+        let formData = new FormData(form);
+
+        let obj = {};
+        formData.forEach(function(value, key){
+            obj[key] = value;
+
+        });
+        let json = JSON.stringify(obj);
+        request.send(json);
+
+        request.addEventListener('readystatechange', function() {
+            if(request.readyState < 4) {
+                stausMessage.innerHTML = message.loading;
+            } else if(request.readyState === 4 && request.status == 200) {
+                stausMessage.innerHTML = message.success; 
+            } else {
+                stausMessage.innerHTML = message.failure;
+            }
+        });
+
+        for(let i = 0; i < inpunt.length; i++) {
+            inpunt[i].value = '';
+        }
+
+    });
+
 });
